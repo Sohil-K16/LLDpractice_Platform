@@ -2,10 +2,6 @@
 
 A locked design system for this app. Every page redesign reads this file before emitting code. Do not regenerate per page — extend or amend this file when the system needs to grow.
 
-## Genre
-modern-minimal
-
-# Design — LLD Practice & Evaluation Platform
 
 ## 1. MVP
 
@@ -220,6 +216,8 @@ This is an MVP, so it currently has:
 
 The architecture leaves room for these capabilities to be added later.
 
+## Genre
+modern-minimal
 
 ## Macrostructure family
 - Marketing / Challenges page: **Bento Workbench** (asymmetric layout with live interactive problem inspection, eliminating the 3-column AI grid and re-drawn window chrome)
