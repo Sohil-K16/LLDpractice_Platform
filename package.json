@@ -4,7 +4,7 @@
   "description": "Low-Level Design (LLD) Practice & Rubric Evaluation Platform",
   "private": true,
   "scripts": {
-    "install:all": "npm install --prefix server && npm install --prefix client",
+    "install:all": "npm install --include=dev --prefix server && npm install --include=dev --prefix client",
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
     "dev": "npm run dev:server",
