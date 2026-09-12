@@ -5,6 +5,222 @@ A locked design system for this app. Every page redesign reads this file before 
 ## Genre
 modern-minimal
 
+# Design — LLD Practice & Evaluation Platform
+
+## 1. MVP
+
+The platform helps learners practice Low-Level Design through the following loop:
+
+**Choose Problem → Design → Submit → Get Feedback → Review → Retry**
+
+The MVP includes:
+
+* 3 LLD problems: Parking Lot, Vending Machine, and Elevator
+* Structured solution submission
+* Optional Mermaid class diagram
+* Rule-based validation
+* AI-assisted evaluation
+* Rubric-based feedback
+* Actionable redo tasks
+* Attempt history and score comparison
+
+The scope intentionally excludes authentication complexity, real-time collaboration, code execution, and large-scale infrastructure.
+
+---
+
+## 2. User Flow
+
+```text
+Choose Problem
+      ↓
+Start Attempt
+      ↓
+Write Solution
+      ↓
+Submit
+      ↓
+Validate
+      ↓
+Evaluate
+      ↓
+View Feedback
+      ↓
+Retry / Review History
+```
+
+An attempt follows:
+
+```text
+DRAFT → SUBMITTED → EVALUATING → COMPLETED
+                              ↘
+                               FAILED
+```
+
+The submission is saved before evaluation so learner work is not lost if AI evaluation fails.
+
+---
+
+## 3. Architecture
+
+The application uses a **modular monolith**.
+
+```text
+React + TypeScript
+        │
+        ▼
+Express + TypeScript
+        │
+   ┌────┴─────┐
+   │          │
+Services   Evaluators
+   │        /  |  \
+   │       /   |   \
+   ▼      Rule AI  Hybrid
+Prisma
+   │
+SQLite
+```
+
+The backend separates problem management, attempts, submissions, validation, and evaluation into different responsibilities.
+
+---
+
+## 4. Core Domain Model
+
+```text
+User
+ │
+ └── Attempt ─── Problem
+       │
+       ├── Submission
+       │
+       └── Evaluation
+              │
+              └── CriterionResult
+```
+
+### Main responsibilities
+
+* **Problem** — stores requirements, constraints, and problem information.
+* **Attempt** — represents one practice session and manages its lifecycle.
+* **Submission** — stores the learner's assumptions, classes, relationships, flows, and design explanation.
+* **Evaluation** — stores the evaluation result and rubric version.
+* **CriterionResult** — stores score, evidence, concern, suggestion, and confidence for each criterion.
+
+---
+
+## 5. Evaluation Approach
+
+The platform uses six evaluation criteria:
+
+| Criterion                    | Weight |
+| ---------------------------- | -----: |
+| Requirements Understanding   |     20 |
+| Class Responsibilities & SRP |     20 |
+| Coupling & Interfaces        |     15 |
+| Extensibility                |     20 |
+| Edge Cases & Testability     |     10 |
+| Explanation & Trade-offs     |     15 |
+
+### Deterministic checks
+
+Used for objective validation such as:
+
+* Required fields
+* Empty submissions
+* Mermaid syntax
+* Basic submission/state validation
+
+### AI evaluation
+
+Used for judgment-heavy areas such as:
+
+* Class responsibilities
+* Coupling and cohesion
+* Abstraction
+* SOLID principles
+* Extensibility
+* Trade-offs
+* Improvement suggestions
+
+AI feedback is structured as:
+
+**Criterion → Score → Evidence → Concern → Suggestion → Confidence**
+
+The evaluator judges the submission against the problem requirements rather than assuming there is only one correct class design.
+
+---
+
+## 6. Evaluator Design
+
+Evaluation is implemented behind an `Evaluator` abstraction:
+
+```text
+Evaluator
+   ├── RuleBasedEvaluator
+   ├── AIEvaluator
+   └── HybridEvaluator
+```
+
+This allows another evaluation approach, such as human review, to be added later without changing the main practice flow.
+
+The `HybridEvaluator` uses AI when available and falls back to rule-based evaluation when the AI service is unavailable or fails.
+
+---
+
+## 7. Key Trade-offs
+
+### Structured text + Mermaid vs code execution
+
+Structured submissions provide enough evidence for LLD reasoning while keeping the MVP achievable within two days. Code execution could be added later.
+
+### Mermaid vs custom diagram editor
+
+Mermaid is easy to store, validate, and render without the implementation cost of building a custom diagram editor.
+
+### SQLite vs PostgreSQL
+
+SQLite keeps the prototype simple and requires no database infrastructure. PostgreSQL would be more appropriate for a larger production deployment.
+
+### Monolith vs microservices
+
+A modular monolith was chosen because the assignment focuses on LLD/domain design rather than large-scale infrastructure.
+
+---
+
+## 8. Attempt History
+
+Each attempt retains its submission and evaluation so learners can compare progress.
+
+The history focuses on **criterion-level improvement**, rather than only comparing overall scores.
+
+Example:
+
+```text
+Attempt 1 → Extensibility: 8/20
+Attempt 2 → Extensibility: 15/20
+                     ↑
+                  Improved
+```
+
+This makes feedback part of an iterative learning loop rather than a one-time score.
+
+---
+
+## 9. Limitations
+
+This is an MVP, so it currently has:
+
+* Limited number of problems
+* No full authentication system
+* No code execution
+* No real-time collaboration
+* Mermaid instead of a custom visual editor
+* Potential variability in AI-generated feedback
+
+The architecture leaves room for these capabilities to be added later.
+
+
 ## Macrostructure family
 - Marketing / Challenges page: **Bento Workbench** (asymmetric layout with live interactive problem inspection, eliminating the 3-column AI grid and re-drawn window chrome)
 - App Workspace pages:       **Workbench** (dual-pane architectural studio with segmented tabs, live Mermaid diagram, and clear requirement drawer)
