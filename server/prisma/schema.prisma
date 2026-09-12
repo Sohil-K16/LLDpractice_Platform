@@ -1,0 +1,96 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String?
+  createdAt DateTime  @default(now())
+  attempts  Attempt[]
+}
+
+model Problem {
+  id           String    @id @default(uuid())
+  title        String
+  slug         String    @unique
+  difficulty   String    // Easy, Medium, Hard
+  description  String
+  requirements String    // JSON string array
+  constraints  String    // JSON string array
+  concepts     String    // JSON string array: e.g. ["Strategy Pattern", "State Pattern"]
+  hints        String?   // JSON string array
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  attempts     Attempt[]
+}
+
+model Attempt {
+  id          String        @id @default(uuid())
+  userId      String?
+  user        User?         @relation(fields: [userId], references: [id])
+  problemId   String
+  problem     Problem       @relation(fields: [problemId], references: [id])
+  status      String        @default("DRAFT") // DRAFT, SUBMITTED, EVALUATING, COMPLETED, FAILED
+  startedAt   DateTime      @default(now())
+  submittedAt DateTime?
+  submissions Submission[]
+  evaluations Evaluation[]
+}
+
+model Submission {
+  id                String      @id @default(uuid())
+  attemptId         String
+  attempt           Attempt     @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  assumptions       String
+  classes           String
+  relationships     String
+  flows             String
+  designExplanation String
+  mermaidDiagram    String?
+  createdAt         DateTime    @default(now())
+}
+
+model Evaluation {
+  id               String            @id @default(uuid())
+  attemptId        String
+  attempt          Attempt           @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  status           String            @default("COMPLETED") // PENDING, COMPLETED, FAILED
+  overallScore     Int               @default(0)
+  rubricVersion    String            @default("1.0.0")
+  model            String            @default("rule-engine")
+  evaluatorType    String            @default("RULE_BASED") // RULE_BASED, AI, HYBRID
+  rawResponse      String?
+  feedbackSummary  String?
+  createdAt        DateTime          @default(now())
+  criterionResults CriterionResult[]
+  feedbackActions  FeedbackAction[]
+}
+
+model CriterionResult {
+  id           String     @id @default(uuid())
+  evaluationId String
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  criterion    String     // Requirements understanding, Class responsibilities, Coupling & interfaces, etc.
+  score        Int
+  maxScore     Int
+  evidence     String     // JSON array of strings or string
+  concern      String?
+  suggestion   String?
+  confidence   Float      @default(1.0)
+}
+
+model FeedbackAction {
+  id           String     @id @default(uuid())
+  evaluationId String
+  evaluation   Evaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  category     String?    // e.g. "Refactor", "Pattern", "Edge Case"
+  completed    Boolean    @default(false)
+}

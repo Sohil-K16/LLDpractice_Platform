@@ -1,0 +1,19 @@
+{
+  "name": "lld-practice-platform",
+  "version": "1.0.0",
+  "description": "Low-Level Design (LLD) Practice & Rubric Evaluation Platform",
+  "private": true,
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "dev": "npm run dev:server",
+    "build:server": "npm run build --prefix server",
+    "build:client": "npm run build --prefix client",
+    "build": "npm run build:server && npm run build:client",
+    "test:server": "npm test --prefix server"
+  },
+  "keywords": ["lld", "system-design", "evaluation", "mermaid", "architecture"],
+  "author": "Antigravity",
+  "license": "MIT"
+}
