@@ -99,3 +99,44 @@ Run the Vitest test suite covering validation services, state machine transition
 cd server
 npm test
 ```
+
+---
+
+## Deployment Guide
+
+### Option 1: Render (Recommended - Free Tier)
+
+Deploy the entire full-stack app (Backend + Frontend + SQLite) to **Render** as a single Web Service:
+
+#### Using Render Blueprints (1-Click):
+1. Push this repo to your GitHub account.
+2. Sign in to [Render Dashboard](https://dashboard.render.com).
+3. Click **New +** → **Blueprint**.
+4. Connect your `LLDpractice_Platform` repository. Render will automatically detect `render.yaml`.
+5. Click **Apply**. Render will automatically build the client, prepare the database, and launch your live site!
+
+#### Manual Web Service Setup:
+1. On [Render](https://dashboard.render.com), click **New +** → **Web Service**.
+2. Connect your GitHub repository (`LLDpractice_Platform`).
+3. Set the following settings:
+   - **Environment**: `Node`
+   - **Build Command**: `npm run install:all && npm run build && npm run db:setup`
+   - **Start Command**: `npm start`
+   - **Plan**: `Free`
+4. Add Environment Variables:
+   - `NODE_ENV` = `production`
+   - `DATABASE_URL` = `file:./dev.db`
+   - *(Optional)* `OPENAI_API_KEY` = your OpenAI key (if using GPT evaluation)
+5. Click **Deploy Web Service**.
+
+---
+
+### Option 2: Docker / Container Deployment
+
+A multi-stage `Dockerfile` is included. Build and run locally or on any cloud VPS (DigitalOcean, AWS ECS, GCP Cloud Run, Fly.io):
+
+```bash
+docker build -t lld-practice-platform .
+docker run -p 5000:5000 -e DATABASE_URL="file:./dev.db" lld-practice-platform
+```
+Open `http://localhost:5000` in your browser.

@@ -1,0 +1,16 @@
+﻿services:
+  - type: web
+    name: lld-practice-platform
+    env: node
+    plan: free
+    buildCommand: npm run install:all && npm run build && npm run db:setup
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: file:./dev.db
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini

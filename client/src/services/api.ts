@@ -1,6 +1,8 @@
 import { Problem, Attempt, Evaluation, RubricCriterionInfo } from '../types';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
+  : (import.meta.env.DEV ? 'http://localhost:5000/api' : '/api');
 
 export async function fetchProblems(): Promise<Problem[]> {
   const res = await fetch(`${API_BASE}/problems`);

@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import fs from 'fs';
 import problemRoutes from './routes/problemRoutes';
 import attemptRoutes from './routes/attemptRoutes';
 import evaluationRoutes from './routes/evaluationRoutes';
@@ -29,5 +31,21 @@ app.use((err: any, _req: express.Request, res: express.Response, _next: express.
     error: err.message || 'Internal server error',
   });
 });
+
+// Serve frontend in production if built
+const clientDistCandidates = [
+  path.resolve(__dirname, '../../client/dist'),
+  path.resolve(process.cwd(), 'client/dist'),
+  path.resolve(process.cwd(), '../client/dist'),
+];
+const clientDistPath = clientDistCandidates.find((p) => fs.existsSync(p));
+
+if (clientDistPath) {
+  app.use(express.static(clientDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) return next();
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
 
 export default app;

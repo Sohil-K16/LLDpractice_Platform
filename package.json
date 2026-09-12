@@ -8,9 +8,11 @@
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
     "dev": "npm run dev:server",
-    "build:server": "npm run build --prefix server",
     "build:client": "npm run build --prefix client",
-    "build": "npm run build:server && npm run build:client",
+    "build:server": "npm run build --prefix server",
+    "build": "npm run build:client && npm run build:server",
+    "db:setup": "npm run db:setup --prefix server",
+    "start": "npm run start --prefix server",
     "test:server": "npm test --prefix server"
   },
   "keywords": ["lld", "system-design", "evaluation", "mermaid", "architecture"],
